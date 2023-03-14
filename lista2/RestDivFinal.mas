@@ -1,0 +1,191 @@
+﻿Clear
+Store result
+Input
+Store X
+Input
+Store Y
+
+isXeqY,  Load X
+		 Subt Y
+         Skipcond 400 	/X=Y
+         Jump loadY		/false
+         Clear
+         Load result
+         Add one
+         Store result
+         Clear
+         Jump halt		/true
+
+loadY,   Load Y
+         Skipcond 000	/Y<0
+         Jump isYzero	/false, is Y=0?
+         Subt Y
+         Subt Y
+         Store Y		/true
+         Clear			/so we make it positive
+         Add one
+         Store negflagY
+		 Clear
+         Jump LoadX
+			
+LoadX, 	 Load X
+         Skipcond 000	/X<0
+         Jump isXzero	/false is X=0?
+         Subt X
+         Subt X
+         Store X		/true
+         Clear			/so we make it positive
+         Add one
+         Store negflagX
+         Clear
+         Jump isXgY
+         
+isYzero, Clear
+		 Load Y
+         Skipcond 400	/Y=0
+         Jump isYone	/false, is it 1?
+         Jump halt
+       
+isYone,  Clear			
+		 Load Y
+         Subt one
+         Skipcond 400	/Y=1
+         Jump LoadX		/false
+         Load X
+         Store result
+         Jump halt	
+
+isXzero, Clear
+		 Load X
+         Skipcond 400	/X=0
+         Jump isXgY		/faslse is X>Y
+         Jump halt
+         
+anfun,   Clear			/we know that bc rest<Y
+		 Load result	/and rest >0
+         Add one		/Y is negative so
+         Store result	/we can have only 1 Y 
+         Jump halt
+         
+chkflg,  Load negflagY
+		 Subt negflagX
+         Skipcond 400	/both negative or positive
+         Jump loop		/false
+         Load negflagY	
+		 Subt one
+         Skipcond 400	/Y negative
+         Jump loop		/false
+         Load Y			/I think we have |Y|>|X|
+         Subt X			/but Y<0 and X>0
+         Store rest		/rest must be smaller than Y
+         Subt X 		/so we check that
+         Skipcond 800	/here
+         Jump anfun		/rest <Y
+         Clear 
+         Store rest
+         Store result
+         Jump halt		/otherwise
+		 
+isXgY,   Clear
+		 Load X
+         Subt Y
+         Skipcond 000	/Y>X
+         Jump loop		/false
+         Jump chkflg	/true
+
+Xdiv,    Load result
+         Store result
+         Load result
+		 Subt result
+         Subt result	/as X is divisible by Y
+         Store result	/and X<0 we make result NEG
+         Jump halt
+         
+Xoff,    Skipcond 000	/means that Y0X1
+		 Jump halt		/false
+         Load X
+         Skipcond 800	/X is our 'rest'
+         Jump Xdiv		/X is divisible by Y
+         Load X
+         Subt Y
+         Store X
+         Load X
+         Subt X
+         Subt X			/making X positive
+         Store rest
+         Clear 
+         Load result	/bc we changed sign of the rest
+         Add one		/we must add 1 to result
+         Store result
+         Load result 
+         Subt result
+         Subt result 
+         Store result 
+         Jump halt
+         
+dneg,    Load X
+         Skipcond 800	/is X divisible by Y?
+         Jump halt		/yes
+         Subt Y			/no
+         Store rest
+         Load rest
+         Subt rest
+         Subt rest
+         Store rest		/making rest positive
+		 Load result 
+		 Add one		/bc of that result +1
+         Store result
+         Jump halt
+         
+flagch,	 Load negflagY		/both positive ok
+		 Skipcond 800		/both negative NEG result
+         Subt negflagX		/Y neg ->  neg result
+         Skipcond 800 		/X neg -> diff rest and + 1 result
+         Jump Xoff			/Y0X1 Y0X0
+         Subt negflagX
+         Skipcond 800
+         Jump dneg  		/Y1X1   
+		 Load result 		/Y1X0
+         Subt result
+         Subt result
+         Store result
+         Jump halt 
+
+loop,    Clear
+		 Load X
+         Subt Y
+         Skipcond 800   /do we have rest?
+         Jump if0		/no	
+loops,   Store X
+         Load X
+         Store rest
+
+   		 Clear
+         Load result
+         Add one
+         Store result 
+         Jump loop 
+         
+if0,	 Skipcond 400 /is the rest = 0?
+		 Jump flagch /no -> flagch
+         Jump loops /yes -> result+1
+
+halt,	 Clear 
+		 Store negflagY
+		 Store negflagX
+		 Load result
+         Output	
+         Load rest
+         Output
+         Clear
+         Store rest
+         Store result	/clear all just in case
+         Halt
+
+X, DEC 0
+Y, DEC 0
+one, DEC 1
+negflagY, DEC 0
+negflagX, DEC 0
+result, DEC 0
+rest, DEC 0

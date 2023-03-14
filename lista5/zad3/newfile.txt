@@ -1,0 +1,10 @@
+a.out
+info_proc2.txt
+info_proc.txt
+JOB
+JOBV2
+lsh.c
+lshJOB.c
+newfile.txt
+test.c
+text

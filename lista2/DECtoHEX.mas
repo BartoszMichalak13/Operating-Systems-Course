@@ -1,0 +1,107 @@
+﻿	    Clear
+        Input 
+        Store X
+        Jump tohex
+
+tohex,	Load pflag		/are we in print phase?
+       	Skipcond 400
+        Jump isitend	/yes
+		Load X
+		Subt hx			
+        Skipcond 800	/X-16<=0
+        Jump isit16		/yes
+tohex2, Store X			/no
+        Load iter
+        Add one
+        Store iter
+        Jump tohex	
+        				
+isit16,	Skipcond 400	/X=0
+		Jump isitend	/false
+        Jump tohex2		/true, so iter+1			
+isitend,Load ppflag		/counting how many numbers to print
+        Add one
+        Store ppflag
+		Load iter
+		Subt hx
+        Skipcond 800	/is iter-16 positive
+		Jump pfload		/no (all good)
+        Jump kk			/yes (we need more space)
+        
+kk,		Load Z			/moving up the stack
+		Store T
+		Load Y
+		Store Z
+		Load X 
+		Store Y
+        Load iter
+        Store X
+        Clear 
+        Store iter
+		Jump tohex
+        
+kkinv, 	Load X			/moving down the stack
+		Store iter
+        Load Y
+        Store X
+        Load Z
+        Store Y
+        Load T
+        Store Z
+        Clear 
+        Store T
+		Jump print
+        
+pfload,	Load pflag		/we are printing
+		Add one
+        Store pflag
+        Jump print
+        
+print, 	Load iter		
+		Subt ten
+        Skipcond 000	/is it number?
+        Jump plet		/no its letter
+        Jump pnum		/yes
+        
+plet,	Load iter		/print letter
+		Add loff
+        Output
+        Load ppflag
+        Subt one		/one less character to print
+        Store ppflag
+        Skipcond 000	/did we print all?
+        Jump kkinv		/no
+        Jump uclear		/yes
+        
+pnum,	Load iter		/printing numbers
+		Add noff
+        Output
+        Load ppflag
+        Subt one		/one less to print
+        Store ppflag
+        Skipcond 000	/is that all?
+        Jump kkinv		/no
+        Jump uclear		/yes
+
+uclear,	Clear			/halt where we clear all
+        Store iter		/just to be safe
+        Store X
+        Store pflag
+        Store Y
+        Store Z
+        Store T
+        Store ppflag
+        halt
+        
+hx, 	DEC 16
+X, 		DEC 0
+Y,		DEC 0
+Z,		DEC 0
+T,		DEC 0
+iter, 	DEC 0
+one, 	DEC 1
+ten, 	DEC 10
+noff, 	DEC 48
+loff,	DEC 55
+pflag,	DEC 0
+ppflag, DEC 0
